@@ -13,6 +13,7 @@ const express = require('express');
 const path = require('path'); 
 const morgan = require('morgan');
 const mysql = require('mysql2');
+const myConnection = require('express-myconnection');
 const app = express();
 
 // importando rutas
@@ -51,26 +52,9 @@ if (process.env.MYSQL_URL) {
 
 console.log('Final DB config:', { ...dbConfig, password: dbConfig.password ? '***' : 'undefined' });
 
-// Crear pool de conexiones con mysql2
-const pool = mysql.createPool(dbConfig);
-
-// Middleware para agregar conexión a req
-app.use((req, res, next) => {
-    req.getConnection = (callback) => {
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Database connection error:', err);
-                return callback(err);
-            }
-            console.log('Database connected successfully');
-            callback(null, connection);
-        });
-    };
-    next();
-});
-
 // configuracion de middlewares
 app.use(morgan('dev'));
+app.use(myConnection(mysql, dbConfig, 'single'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
@@ -101,7 +85,6 @@ app.get('/init-db', (req, res) => {
         }
         
         connection.query(createTableQuery, (err, results) => {
-            connection.release(); // Liberar la conexión
             if (err) {
                 return res.status(500).json({ error: 'Table creation failed', details: err });
             }
