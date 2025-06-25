@@ -1,24 +1,13 @@
 require('dotenv').config();
 
-// Debug logs más detallados
-console.log('=== FULL ENVIRONMENT DEBUG ===');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('All DB variables:');
+// Debug completo de TODAS las variables
+console.log('=== ALL ENVIRONMENT VARIABLES ===');
 Object.keys(process.env).forEach(key => {
-    if (key.startsWith('DB_') || key === 'PORT') {
+    if (key.includes('MYSQL') || key.includes('DATABASE') || key.startsWith('DB_') || key === 'PORT') {
         console.log(`${key}: "${process.env[key]}"`);
     }
 });
-console.log('===============================');
-
-// Debug: mostrar variables de entorno
-console.log('=== DATABASE CONFIG ===');
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('Has password:', !!process.env.DB_PASSWORD);
-console.log('========================');
+console.log('================================');
 
 const express = require('express');
 const path = require('path'); 
@@ -35,21 +24,42 @@ app.set('port', process.env.PORT || 3000);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// configuracion de middlewares (funciones que se ejecutam antes de las petciones de los usuarios)
+// Configuración de base de datos usando MYSQL_URL o variables individuales
+let dbConfig;
+
+if (process.env.MYSQL_URL) {
+    // Usar MYSQL_URL que Railway proporciona automáticamente
+    const url = new URL(process.env.MYSQL_URL);
+    dbConfig = {
+        host: url.hostname,
+        port: parseInt(url.port),
+        user: url.username,
+        password: url.password,
+        database: url.pathname.substring(1) // remover el '/' inicial
+    };
+    console.log('Using MYSQL_URL config');
+} else {
+    // Fallback a variables individuales
+    dbConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD,
+        port: parseInt(process.env.DB_PORT) || 3306,
+        database: process.env.DB_NAME || 'practica_2'
+    };
+    console.log('Using individual DB_ variables');
+}
+
+console.log('Final DB config:', { ...dbConfig, password: dbConfig.password ? '***' : 'undefined' });
+
+// configuracion de middlewares
 app.use(morgan('dev'));
-app.use(myConnection(mysql, {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 3306,
-    database: process.env.DB_NAME || 'practica_2'
-} ,'single' ));
+app.use(myConnection(mysql, dbConfig, 'single'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 // rutas
-app.use('/', customerRoutes); 
-
+app.use('/', customerRoutes);
 
 //static files
 app.use(express.static(path.join(__dirname, 'public'))); 
