@@ -19,6 +19,7 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 # Logs
 logs
@@ -41,3 +42,7 @@ config/local.js
 src/config/database.js
 *.sql
 database/backups/
+
+# Production
+build/
+dist/
