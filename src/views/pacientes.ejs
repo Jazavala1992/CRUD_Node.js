@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elige Ser</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <div class="row">
+        <nav class="navbar bg-body-tertiary" >
+            <div class="container-fluid" style="background-color:rgb(12, 48, 70); height: 100px; padding-left: 60px;">
+                 <a class="navbar-brand" href="/">
+                     <img src="/imagenes/logo2.png" width="80" height="68" class="d-inline-block align-text-top" >                  
+                 </a>
+                 <h1 style="color: aliceblue; padding-right: 30px;">Base de datos de los Paciente</h1>
+            </div>
+        </nav>     
+    </div>
+
+    <div class="row" style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <form action="/add" method="post" class="row g-3">
+            <div class="col-md-4" style="width: 205px;">
+            <label for="Nombre" class="form-label">Nombre:</label>
+            <input type="text" name="nombre" class="form-control" aria-describedby="nombre" required>
+            </div>
+            
+            <div class="col-md-4" style="width: 205px;">
+            <label for="apellido" class="form-label">Apellido:</label>
+            <input type="text" name="apellido" class="form-control" aria-describedby="apellido" required>
+            </div>
+            
+            <div class="col-md-4" style="width: 205px;">
+            <label for="edad" class="form-label">Edad:</label>
+            <input type="number" name="edad" class="form-control" aria-describedby="edad" required>
+            </div>
+            
+            <div class="col-md-4" style="width: 205px;">
+            <label for="talla" class="form-label">Talla:</label>
+            <input type="number" step="0.01" name="talla" class="form-control" aria-describedby="talla" required>
+            </div>
+
+            <div class="col-md-4" style="width: 205px;">
+            <label for="peso" class="form-label">Peso:</label>
+            <input type="text" name="peso" class="form-control" aria-describedby="peso" required>
+            </div>
+            
+            <div class="col-md-4" style="width: 205px;">
+            <label for="sexo" class="form-label">Sexo:</label>
+            <input type="text" name="sexo" class="form-control" aria-describedby="sexo" required>
+            </div>
+    
+            <div class="col-md-4">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+            </div>    
+    </form>
+    </div>
+
+    <div class="row" style= "padding: 20px;">
+        <table class="table">
+            <thead>
+              <tr class="table-secondary">
+                <th scope="col">Id</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Edad</th>
+                <th scope="col">Talla</th>
+                <th scope="col">Sexo</th>
+                <th scope="col">Peso</th>
+                <th scope="col" style="width: 200px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% if (data) { %>
+                    <% for (var i = 0; i < data.length; i++) { %>
+                        <tr>
+                            <td><%= data[i].id %></td>
+                            <td><%= data[i].nombre %></td>
+                            <td><%= data[i].apellido %></td>
+                            <td><%= data[i].edad %></td>
+                            <td><%= data[i].talla %></td>
+                            <td><%= data[i].sexo %></td>
+                            <td><%= data[i].peso %></td>
+                            <td>
+                                <a href="#" class="btn btn-danger" onclick="deletePaciente('<%= data[i].id %>')">Eliminar</a>
+                                <a href="/update/<%= data[i].id %>" class="btn btn-warning">Editar</a>
+                            </td>
+                        </tr> 
+                    <% } %>
+                <% } %>
+            </tbody>
+            
+            <script>
+            function deletePaciente(id) {
+                if (confirm('¿Estás seguro de que deseas eliminar este paciente?')) {
+                    fetch(`/delete/${id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el paciente');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            }
+            </script>
+        
+        </table>
+
+          <div id="queryResult"></div>
+
+    </div>
+</body>
+</html>

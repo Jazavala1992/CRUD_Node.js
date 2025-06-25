@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'whitenice';
+    src: url('/fonts/Whitenice.ttf') format('truetype');
+}
+
+h1 {
+    font-family: 'whitenice', sans-serif;
+}
