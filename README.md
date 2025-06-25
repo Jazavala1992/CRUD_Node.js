@@ -3,7 +3,7 @@
 Aplicación web fullstack para gestión de usuarios con operaciones CRUD completas.
 
 ## 🚀 Demo en vivo
-[Ver aplicación desplegada](https://tu-url.up.railway.app)
+[Ver aplicación desplegada](https://crudnodejs-production-079d.up.railway.app/)
 
 ## 🛠 Tecnologías utilizadas
 - **Backend**: Node.js + Express
@@ -26,7 +26,7 @@ Aplicación web fullstack para gestión de usuarios con operaciones CRUD complet
 - **Variables de entorno**: Configuradas en Railway
 
 ## 📝 Uso
-1. Visita [la aplicación](https://tu-url.up.railway.app)
+1. Visita [la aplicación](https://crudnodejs-production-079d.up.railway.app/)
 2. Agrega usuarios desde el formulario
 3. Visualiza, edita o elimina usuarios de la lista
 
