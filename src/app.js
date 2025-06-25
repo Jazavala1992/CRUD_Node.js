@@ -34,6 +34,35 @@ app.use('/', customerRoutes);
 app.use(express.static(path.join(__dirname, 'public'))); 
 
 
+// Endpoint temporal para inicializar la base de datos
+app.get('/init-db', (req, res) => {
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS users (
+            id int(11) NOT NULL AUTO_INCREMENT,
+            nombre varchar(20) NOT NULL,
+            apellido varchar(20) NOT NULL,
+            edad INT(11) NOT NULL,
+            talla DECIMAL(5,2) NOT NULL,
+            peso INT(11) NOT NULL,
+            sexo varchar(20) NOT NULL,
+            PRIMARY KEY (id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    `;
+    
+    req.getConnection((err, connection) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database connection failed' });
+        }
+        
+        connection.query(createTableQuery, (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: 'Table creation failed', details: err });
+            }
+            res.json({ message: 'Table created successfully', results });
+        });
+    });
+});
+
 // empezando el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
