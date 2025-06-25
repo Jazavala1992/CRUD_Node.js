@@ -36,3 +36,8 @@ logs
 
 # Configuración específica del desarrollador
 config/local.js
+
+# Archivos de configuración sensible
+src/config/database.js
+*.sql
+database/backups/

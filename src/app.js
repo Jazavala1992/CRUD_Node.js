@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path'); 
 const morgan = require('morgan');
@@ -16,11 +17,11 @@ app.set('views', path.join(__dirname, 'views'));
 // configuracion de middlewares (funciones que se ejecutam antes de las petciones de los usuarios)
 app.use(morgan('dev'));
 app.use(myConnection(mysql, {
-    host: 'localhost',
-    user: 'root',
-    password: 'J.zavala1992',
-    port: 3306,
-    database: 'practica_2'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_NAME || 'practica_2'
 } ,'single' ));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
