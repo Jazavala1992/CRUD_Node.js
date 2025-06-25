@@ -12,7 +12,7 @@ console.log('================================');
 const express = require('express');
 const path = require('path'); 
 const morgan = require('morgan');
-const mysql = require('mysql');
+const mysql = require('mysql2'); // Cambio aquí: mysql2 en lugar de mysql
 const myConnection = require('express-myconnection');
 const app = express();
 
