@@ -1,11 +1,23 @@
 require('dotenv').config();
 
+// Debug logs más detallados
+console.log('=== FULL ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('All DB variables:');
+Object.keys(process.env).forEach(key => {
+    if (key.startsWith('DB_') || key === 'PORT') {
+        console.log(`${key}: "${process.env[key]}"`);
+    }
+});
+console.log('===============================');
+
 // Debug: mostrar variables de entorno
 console.log('=== DATABASE CONFIG ===');
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_PORT:', process.env.DB_PORT);
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_NAME:', process.env.DB_NAME);
+console.log('Has password:', !!process.env.DB_PASSWORD);
 console.log('========================');
 
 const express = require('express');
