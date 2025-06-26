@@ -1,16 +1,6 @@
 require('dotenv').config();
 
-const express = require('express');
-const path = require('path'); 
-const morgan = require('morgan');
 const mysql = require('mysql2');
-const myConnection = require('express-myconnection');
-
-const app = express();
-
-// Configurar EJS para Vercel
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', 'src', 'views'));
 
 // Configuración de base de datos
 let dbConfig;
@@ -27,44 +17,87 @@ if (process.env.MYSQL_URL) {
         timeout: 60000,
         reconnect: true
     };
-} else {
-    dbConfig = {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        port: parseInt(process.env.DB_PORT) || 3306,
-        database: process.env.DB_NAME,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
-    };
 }
 
-// Middlewares
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-app.use(myConnection(mysql, dbConfig, 'single'));
+// Vercel espera una función que reciba (req, res)
+module.exports = (req, res) => {
+    // Configurar CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
 
-// Ruta básica de prueba
-app.get('/', (req, res) => {
-    res.json({ 
-        message: 'API funcionando en Vercel',
-        timestamp: new Date().toISOString(),
-        env: process.env.NODE_ENV || 'development'
-    });
-});
+    const { url, method } = req;
 
-app.get('/test', (req, res) => {
-    res.json({ message: 'Test endpoint working' });
-});
+    // Ruta principal
+    if (url === '/' && method === 'GET') {
+        res.status(200).json({
+            message: 'API funcionando en Vercel',
+            timestamp: new Date().toISOString(),
+            available_endpoints: [
+                '/init-pacientes - Inicializar base de datos',
+                '/test - Endpoint de prueba'
+            ]
+        });
+        return;
+    }
 
-// Manejar todas las rutas
-app.all('*', (req, res) => {
-    res.json({ 
+    // Endpoint de prueba
+    if (url === '/test' && method === 'GET') {
+        res.status(200).json({ 
+            message: 'Test endpoint working',
+            env_vars: {
+                has_mysql_url: !!process.env.MYSQL_URL,
+                has_db_host: !!process.env.DB_HOST
+            }
+        });
+        return;
+    }
+
+    // Inicializar base de datos
+    if (url === '/init-pacientes' && method === 'GET') {
+        const connection = mysql.createConnection(dbConfig);
+        
+        const createTableQuery = `
+            CREATE TABLE IF NOT EXISTS pacientes (
+                id int(11) NOT NULL AUTO_INCREMENT,
+                nombre varchar(20) NOT NULL,
+                apellido varchar(20) NOT NULL,
+                edad INT(11) NOT NULL,
+                talla DECIMAL(5,2) NOT NULL,
+                peso INT(11) NOT NULL,
+                sexo varchar(20) NOT NULL,
+                PRIMARY KEY (id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        `;
+        
+        connection.query(createTableQuery, (err, results) => {
+            connection.end();
+            
+            if (err) {
+                res.status(500).json({ 
+                    error: 'Table creation failed', 
+                    details: err.message 
+                });
+                return;
+            }
+            
+            res.status(200).json({ 
+                message: 'Table pacientes created successfully', 
+                results 
+            });
+        });
+        return;
+    }
+
+    // Ruta no encontrada
+    res.status(404).json({ 
         message: 'Ruta no encontrada',
-        path: req.path,
-        method: req.method
+        path: url,
+        method: method
     });
-});
-
-module.exports = app;
+};
