@@ -20,7 +20,7 @@ if (process.env.MYSQL_URL) {
 }
 
 // Vercel espera una función que reciba (req, res)
-module.exports = (req, res) => {
+export default function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
     
     if (req.url === '/') {
