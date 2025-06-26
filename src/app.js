@@ -83,13 +83,12 @@ app.use('/', customerRoutes);
 //static files
 app.use(express.static(path.join(__dirname, 'public'))); 
 
-// Para desarrollo local y Railway
-if (!process.env.VERCEL) {
+// Solo para desarrollo local y Railway
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en el puerto ${PORT}`);
     });
 }
 
-// Exportar para Vercel
 module.exports = app;
