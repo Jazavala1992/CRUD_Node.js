@@ -17,7 +17,6 @@ app.set('views', path.join(__dirname, 'views'));
 // Configuración de base de datos
 let dbConfig;
 
-// Para Vercel, necesitarás una base de datos externa
 if (process.env.MYSQL_URL) {
     const url = new URL(process.env.MYSQL_URL);
     dbConfig = {
@@ -26,13 +25,11 @@ if (process.env.MYSQL_URL) {
         user: url.username,
         password: url.password,
         database: url.pathname.substring(1),
-        // Configuraciones adicionales para serverless
         acquireTimeout: 60000,
         timeout: 60000,
         reconnect: true
     };
 } else {
-    // Variables individuales como fallback
     dbConfig = {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
@@ -86,11 +83,10 @@ app.use('/', customerRoutes);
 //static files
 app.use(express.static(path.join(__dirname, 'public'))); 
 
-// Para Vercel, exportar la app en lugar de listen
+// Para Vercel (serverless) y Railway
 if (process.env.VERCEL) {
     module.exports = app;
 } else {
-    // Para desarrollo local y Railway
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en el puerto ${PORT}`);
