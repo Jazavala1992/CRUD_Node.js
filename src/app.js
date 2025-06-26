@@ -11,34 +11,29 @@ const app = express();
 const customerRoutes = require('./routes/customer'); 
 
 // Configuracion para nodejs
+app.set('port', process.env.PORT || 3000);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Configuración de base de datos
-let dbConfig;
-
+// Configuración de base de datos - LIMPIA, sin opciones inválidas
 if (process.env.MYSQL_URL) {
     const url = new URL(process.env.MYSQL_URL);
-    dbConfig = {
+    var dbConfig = {
         host: url.hostname,
         port: parseInt(url.port),
         user: url.username,
         password: url.password,
-        database: url.pathname.substring(1),
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        database: url.pathname.substring(1)
+        // Removidas: acquireTimeout, timeout, reconnect
     };
 } else {
-    dbConfig = {
+    var dbConfig = {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         port: parseInt(process.env.DB_PORT) || 3306,
-        database: process.env.DB_NAME,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        database: process.env.DB_NAME
+        // Removidas: acquireTimeout, timeout, reconnect
     };
 }
 
@@ -83,12 +78,10 @@ app.use('/', customerRoutes);
 //static files
 app.use(express.static(path.join(__dirname, 'public'))); 
 
-// Solo para desarrollo local y Railway
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en el puerto ${PORT}`);
-    });
-}
+// empezando el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
 
 module.exports = app;

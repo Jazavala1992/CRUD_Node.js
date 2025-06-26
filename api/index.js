@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 
-// Configuración de base de datos
+// Configuración de base de datos - LIMPIA
 let dbConfig;
 
 if (process.env.MYSQL_URL) {
@@ -10,10 +10,8 @@ if (process.env.MYSQL_URL) {
         port: parseInt(url.port),
         user: url.username,
         password: url.password,
-        database: url.pathname.substring(1),
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        database: url.pathname.substring(1)
+        // Removidas las opciones inválidas
     };
 }
 
@@ -84,7 +82,11 @@ module.exports = (req, res) => {
             });
         });
     } else if (url === '/pacientes' && method === 'GET') {
-        // Listar todos los pacientes
+        if (!dbConfig) {
+            res.status(500).json({ error: 'Database not configured' });
+            return;
+        }
+
         const connection = mysql.createConnection(dbConfig);
         
         connection.query('SELECT * FROM pacientes', (err, results) => {
@@ -103,7 +105,11 @@ module.exports = (req, res) => {
         });
 
     } else if (url === '/pacientes' && method === 'POST') {
-        // Crear nuevo paciente
+        if (!dbConfig) {
+            res.status(500).json({ error: 'Database not configured' });
+            return;
+        }
+
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -138,7 +144,7 @@ module.exports = (req, res) => {
         res.status(404).json({
             message: 'Endpoint no encontrado',
             requested_url: url,
-            available_endpoints: ['/api/', '/api/test', '/api/init-pacientes']
+            available_endpoints: ['/api/', '/api/test', '/api/init-pacientes', '/api/pacientes']
         });
     }
 };
