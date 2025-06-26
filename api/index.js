@@ -58,35 +58,6 @@ app.get('/test', (req, res) => {
     res.json({ message: 'Test endpoint working' });
 });
 
-// Endpoint para crear tabla
-app.get('/init-pacientes', (req, res) => {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS pacientes (
-            id int(11) NOT NULL AUTO_INCREMENT,
-            nombre varchar(20) NOT NULL,
-            apellido varchar(20) NOT NULL,
-            edad INT(11) NOT NULL,
-            talla DECIMAL(5,2) NOT NULL,
-            peso INT(11) NOT NULL,
-            sexo varchar(20) NOT NULL,
-            PRIMARY KEY (id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    `;
-    
-    req.getConnection((err, connection) => {
-        if (err) {
-            return res.status(500).json({ error: 'Database connection failed', details: err.message });
-        }
-        
-        connection.query(createTableQuery, (err, results) => {
-            if (err) {
-                return res.status(500).json({ error: 'Table creation failed', details: err });
-            }
-            res.json({ message: 'Table pacientes created successfully', results });
-        });
-    });
-});
-
 // Manejar todas las rutas
 app.all('*', (req, res) => {
     res.json({ 
@@ -95,13 +66,5 @@ app.all('*', (req, res) => {
         method: req.method
     });
 });
-
-// Incluir rutas de customer
-try {
-    const customerRoutes = require('../src/routes/customer');
-    app.use('/', customerRoutes);
-} catch (error) {
-    console.log('Customer routes not found:', error.message);
-}
 
 module.exports = app;
