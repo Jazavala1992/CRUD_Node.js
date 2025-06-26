@@ -21,10 +21,5 @@ if (process.env.MYSQL_URL) {
 
 // Usar module.exports en lugar de export default
 module.exports = (req, res) => {
-    res.status(200).json({
-        message: 'Hello from Vercel!',
-        timestamp: new Date().toISOString(),
-        url: req.url,
-        method: req.method
-    });
+    res.status(200).send('Hello World!');
 };
