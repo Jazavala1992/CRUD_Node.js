@@ -45,12 +45,17 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(myConnection(mysql, dbConfig, 'single'));
 
-// Ruta de prueba simple
+// Ruta básica de prueba
 app.get('/', (req, res) => {
     res.json({ 
-        message: 'Aplicación funcionando en Vercel',
-        timestamp: new Date().toISOString()
+        message: 'API funcionando en Vercel',
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV || 'development'
     });
+});
+
+app.get('/test', (req, res) => {
+    res.json({ message: 'Test endpoint working' });
 });
 
 // Endpoint para crear tabla
@@ -79,6 +84,15 @@ app.get('/init-pacientes', (req, res) => {
             }
             res.json({ message: 'Table pacientes created successfully', results });
         });
+    });
+});
+
+// Manejar todas las rutas
+app.all('*', (req, res) => {
+    res.json({ 
+        message: 'Ruta no encontrada',
+        path: req.path,
+        method: req.method
     });
 });
 
