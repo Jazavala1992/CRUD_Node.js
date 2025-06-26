@@ -21,45 +21,20 @@ if (process.env.MYSQL_URL) {
 
 // Vercel espera una función que reciba (req, res)
 module.exports = (req, res) => {
-    // Configurar CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
     
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    const { url, method } = req;
-
-    // Ruta principal
-    if (url === '/' && method === 'GET') {
+    if (req.url === '/') {
         res.status(200).json({
             message: 'API funcionando en Vercel',
             timestamp: new Date().toISOString(),
-            available_endpoints: [
-                '/init-pacientes - Inicializar base de datos',
-                '/test - Endpoint de prueba'
-            ]
+            url: req.url,
+            method: req.method
         });
-        return;
-    }
-
-    // Endpoint de prueba
-    if (url === '/test' && method === 'GET') {
-        res.status(200).json({ 
-            message: 'Test endpoint working',
-            env_vars: {
-                has_mysql_url: !!process.env.MYSQL_URL,
-                has_db_host: !!process.env.DB_HOST
-            }
+    } else if (req.url === '/test') {
+        res.status(200).json({
+            message: 'Test endpoint working'
         });
-        return;
-    }
-
-    // Inicializar base de datos
-    if (url === '/init-pacientes' && method === 'GET') {
+    } else if (req.url === '/init-pacientes' && req.method === 'GET') {
         const connection = mysql.createConnection(dbConfig);
         
         const createTableQuery = `
@@ -91,13 +66,10 @@ module.exports = (req, res) => {
                 results 
             });
         });
-        return;
+    } else {
+        res.status(404).json({
+            message: 'Ruta no encontrada',
+            url: req.url
+        });
     }
-
-    // Ruta no encontrada
-    res.status(404).json({ 
-        message: 'Ruta no encontrada',
-        path: url,
-        method: method
-    });
 };
