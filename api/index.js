@@ -83,6 +83,57 @@ module.exports = (req, res) => {
                 results 
             });
         });
+    } else if (url === '/pacientes' && method === 'GET') {
+        // Listar todos los pacientes
+        const connection = mysql.createConnection(dbConfig);
+        
+        connection.query('SELECT * FROM pacientes', (err, results) => {
+            connection.end();
+            
+            if (err) {
+                res.status(500).json({ error: 'Error fetching pacientes', details: err.message });
+                return;
+            }
+            
+            res.status(200).json({ 
+                success: true,
+                count: results.length,
+                data: results 
+            });
+        });
+
+    } else if (url === '/pacientes' && method === 'POST') {
+        // Crear nuevo paciente
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', () => {
+            try {
+                const paciente = JSON.parse(body);
+                const connection = mysql.createConnection(dbConfig);
+                
+                const query = 'INSERT INTO pacientes SET ?';
+                connection.query(query, paciente, (err, result) => {
+                    connection.end();
+                    
+                    if (err) {
+                        res.status(500).json({ error: 'Error creating paciente', details: err.message });
+                        return;
+                    }
+                    
+                    res.status(201).json({ 
+                        success: true,
+                        message: 'Paciente creado exitosamente',
+                        id: result.insertId 
+                    });
+                });
+            } catch (error) {
+                res.status(400).json({ error: 'Invalid JSON data' });
+            }
+        });
+
     } else {
         res.status(404).json({
             message: 'Endpoint no encontrado',
