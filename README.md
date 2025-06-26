@@ -1,34 +1,30 @@
 # Práctica 3 - CRUD Node.js con MySQL
 
-Aplicación web fullstack para gestión de usuarios con operaciones CRUD completas.
+Aplicación web fullstack para gestión de pacientes con operaciones CRUD completas.
 
 ## 🚀 Demo en vivo
-[Ver aplicación desplegada](https://crudnodejs-production-079d.up.railway.app/)
+- **Railway**: [https://crudnodejs-production-079d.up.railway.app/](https://crudnodejs-production-079d.up.railway.app/)
+- **Vercel**: [https://tu-app.vercel.app](https://tu-app.vercel.app) *(después del deploy)*
 
 ## 🛠 Tecnologías utilizadas
 - **Backend**: Node.js + Express
 - **Base de datos**: MySQL
 - **Templates**: EJS
 - **Estilos**: Bootstrap
-- **Despliegue**: Railway
+- **Despliegue**: Railway & Vercel
 
-## ⚡ Funcionalidades
-- ✅ Crear usuarios
-- ✅ Leer/Listar usuarios  
-- ✅ Actualizar usuarios
-- ✅ Eliminar usuarios
-- ✅ Validación de formularios
+## 📝 Características
+- ✅ Sistema CRUD completo para pacientes
+- ✅ Formularios para agregar/editar pacientes
+- ✅ Lista dinámica de pacientes
+- ✅ Base de datos MySQL en la nube
 - ✅ Interfaz responsive
+- ✅ Desplegado en múltiples plataformas
 
 ## 🚀 Despliegue
-- **Aplicación**: Railway
-- **Base de datos**: MySQL en Railway
-- **Variables de entorno**: Configuradas en Railway
-
-## 📝 Uso
-1. Visita [la aplicación](https://crudnodejs-production-079d.up.railway.app/)
-2. Agrega usuarios desde el formulario
-3. Visualiza, edita o elimina usuarios de la lista
+- **Aplicación**: Railway & Vercel
+- **Base de datos**: MySQL compartida
+- **Variables de entorno**: Configuradas en ambas plataformas
 
 ## 👨‍💻 Desarrollado por
 José Zavala - Web III
