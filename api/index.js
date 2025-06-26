@@ -19,22 +19,35 @@ if (process.env.MYSQL_URL) {
     };
 }
 
-// Vercel espera una función que reciba (req, res)
-export default function handler(req, res) {
+// Usar module.exports en lugar de export default
+module.exports = (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
-    if (req.url === '/') {
+    if (req.url === '/' || req.url === '/api' || req.url === '/api/') {
         res.status(200).json({
             message: 'API funcionando en Vercel',
             timestamp: new Date().toISOString(),
             url: req.url,
-            method: req.method
+            method: req.method,
+            env_check: {
+                has_mysql_url: !!process.env.MYSQL_URL,
+                has_db_host: !!process.env.DB_HOST
+            }
         });
     } else if (req.url === '/test') {
         res.status(200).json({
-            message: 'Test endpoint working'
+            message: 'Test endpoint working',
+            dbConfig_defined: !!dbConfig
         });
     } else if (req.url === '/init-pacientes' && req.method === 'GET') {
+        if (!dbConfig) {
+            res.status(500).json({ 
+                error: 'Database configuration not found',
+                mysql_url_exists: !!process.env.MYSQL_URL
+            });
+            return;
+        }
+
         const connection = mysql.createConnection(dbConfig);
         
         const createTableQuery = `
@@ -69,7 +82,8 @@ export default function handler(req, res) {
     } else {
         res.status(404).json({
             message: 'Ruta no encontrada',
-            url: req.url
+            url: req.url,
+            available_routes: ['/', '/test', '/init-pacientes']
         });
     }
 };
