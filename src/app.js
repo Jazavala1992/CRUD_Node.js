@@ -33,46 +33,11 @@ app.use(myConnection(mysql, dbConfig, 'single'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-// Debug: mostrar todas las rutas registradas
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-});
-
 // rutas
 app.use('/', customerRoutes);
 
 //static files
 app.use(express.static(path.join(__dirname, 'public'))); 
-
-// Endpoint para crear la tabla pacientes (que el código está esperando)
-app.get('/init-pacientes', (req, res) => {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS pacientes (
-            id int(11) NOT NULL AUTO_INCREMENT,
-            nombre varchar(20) NOT NULL,
-            apellido varchar(20) NOT NULL,
-            edad INT(11) NOT NULL,
-            talla DECIMAL(5,2) NOT NULL,
-            peso INT(11) NOT NULL,
-            sexo varchar(20) NOT NULL,
-            PRIMARY KEY (id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    `;
-    
-    req.getConnection((err, connection) => {
-        if (err) {
-            return res.status(500).json({ error: 'Database connection failed', details: err.message });
-        }
-        
-        connection.query(createTableQuery, (err, results) => {
-            if (err) {
-                return res.status(500).json({ error: 'Table creation failed', details: err });
-            }
-            res.json({ message: 'Table pacientes created successfully', results });
-        });
-    });
-});
 
 // empezando el servidor
 const PORT = process.env.PORT || 3000;
